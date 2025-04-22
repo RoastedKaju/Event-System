@@ -1,5 +1,11 @@
 # Prerequisites
 *.d
+*.sln
+*.vcxproj
+*.user
+.vs/
+Binaries/
+Intermediate/
 
 # Compiled Object files
 *.slo
