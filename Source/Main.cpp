@@ -11,6 +11,7 @@ int main()
 	ExampleWindow* window = new ExampleWindow();
 
 	window->SimulateMouseButtonPressed(52);
+	window->SimulateMouseButtonReleased(12);
 
 	// Clean up
 	delete window;

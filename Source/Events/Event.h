@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <array>
 
 #include "UtilMacros.h"
 
@@ -20,7 +21,7 @@ namespace EventSystem
 
 	/**
 	* @brief Container for event argument data and type safe access
-	* 
+	*
 	* This union based custom variant allows storing different argument types
 	* while maintaining type safety through Type enum.
 	*/
@@ -51,7 +52,7 @@ namespace EventSystem
 
 	/**
 	* @brief Converts integer into event argument
-	* 
+	*
 	* @param value Integer value
 	*/
 	inline EventArgument MakeArgument(int value)
@@ -106,7 +107,7 @@ namespace EventSystem
 
 	/**
 	* @brief Container for Event data
-	* 
+	*
 	* Information related to event like event type (Window Resize, Mouse Clicked etc)
 	* Number of arguments the event has and the array containing the arguments
 	*/
@@ -116,17 +117,21 @@ namespace EventSystem
 
 		EventType m_type;
 		uint32_t m_numArgs;
-		EventArgument m_args[MAX_ARGS];
+		std::array<EventArgument, MAX_ARGS> m_args;
 	};
 
-	template<typename... Args>
-	inline std::array<EventArgument, Event::MAX_ARGS> BuildEventArguments(uint32_t outCount, Args&&... args)
+	template<typename... T>
+	std::array<EventArgument, Event::MAX_ARGS> BuildArguments(T&&... args)
 	{
-		std::array<EventArgument, Event::MAX_ARGS> result;
-		outCount = 0;
+		static_assert(sizeof...(T) <= Event::MAX_ARGS, "Too many arguments for event");
 
-		auto pack = { (result[outCount++] = MakeArgument(std::forward<Args>(args)), 0)... };
-		UNUSED(pack);
+		std::array<EventArgument, Event::MAX_ARGS> result;
+
+		size_t index = 0;
+		// Fold expression trick using an initializer list
+		(void)std::initializer_list<int>{
+			((result[index++] = MakeArgument(std::forward<T>(args))), 0)...
+		};
 
 		return result;
 	}
@@ -136,6 +141,12 @@ namespace EventSystem
 	class EventDispatcher
 	{
 	public:
+		static EventDispatcher& Get()
+		{
+			static EventDispatcher instance;
+			return instance;
+		}
+
 		void AddListener(EventType type, EventHandler handler)
 		{
 			m_listeners[type].push_back(handler);
@@ -155,6 +166,20 @@ namespace EventSystem
 		}
 
 	private:
+		EventDispatcher() = default;
+		EventDispatcher(const EventDispatcher&) = delete;
+		EventDispatcher& operator=(const EventDispatcher&) = delete;
+
 		std::unordered_map<EventType, std::vector<EventHandler>> m_listeners;
 	};
 }
+
+#define ADD_LISTENER_GLOBAL(type, handler) \
+	EventSystem::EventDispatcher::Get().AddListener(type, handler)
+
+#define BROADCAST_GLOBAL(eventType, ...)                                          \
+	do {                                                                          \
+		auto args = EventSystem::BuildArguments(__VA_ARGS__);                    \
+		EventSystem::Event e { eventType, static_cast<uint32_t>(args.size()), args }; \
+		EventSystem::EventDispatcher::Get().Broadcast(e);                       \
+	} while (0)
