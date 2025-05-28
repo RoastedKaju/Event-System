@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#define BIND_EVENT_FN(x) std::cout << "Unimplemented" << std::endl;
+#define BIND_EVENT_FN(fn, obj) std::bind(fn, obj, std::placeholders::_1)
 
 /**
  * @brief A simple Event interface
@@ -32,4 +32,33 @@ public:
 	{
 		return descriptor;
 	}
+};
+
+/**
+ * @brief A sample windows event used for testing.
+ */
+class CustomWindowEvent : public Event
+{
+public:
+	CustomWindowEvent() {}
+	CustomWindowEvent(unsigned int width, unsigned int height)
+	{
+		m_data.width = width;
+		m_data.height = height;
+	}
+	virtual ~CustomWindowEvent() {}
+
+	static constexpr DescriptorType descriptor = "CustomWindowEvent";
+
+	virtual DescriptorType GetType() const override
+	{
+		return descriptor;
+	}
+
+	// You can store data here inside of a custom struct
+	// And reterive it inside the 'OnHandleEvent' of your observer class
+	struct {
+		unsigned int width = 800;
+		unsigned int height = 600;
+	} m_data;
 };
