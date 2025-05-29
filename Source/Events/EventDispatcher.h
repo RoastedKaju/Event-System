@@ -11,13 +11,13 @@
 class EventDispatcher
 {
 public:
-	using FunctionType = std::function<void(const Event&)>;
+	using FunctionType = std::function<void(Event&)>;
 
-	void Subscribe(const Event::DescriptorType& type, FunctionType&& function);
+	void Subscribe(const EventType& type, FunctionType&& function);
 
 	// Using this any client can send events to all observers that are intrested in them.
-	void Broadcast(const Event& event) const;
+	void Broadcast(Event& event) const;
 
 protected:
-	std::unordered_map<Event::DescriptorType, std::vector<FunctionType>> m_observers;
+	std::unordered_map<EventType, std::vector<FunctionType>> m_observers;
 };

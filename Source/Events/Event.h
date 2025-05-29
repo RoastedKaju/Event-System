@@ -4,31 +4,47 @@
 
 #define BIND_EVENT_FN(fn, obj) std::bind(fn, obj, std::placeholders::_1)
 
+enum class EventType
+{
+	WindowResize, WindowClose, WindowMaximize, WindowMinimize,
+	MouseButtonPressed, MouseButtonReleased, MouseScrolled, MouseMoved
+};
+
 /**
  * @brief A simple Event interface
+ *
  */
 class Event
 {
 public:
 	virtual ~Event() = default;
 
-	using DescriptorType = const char*;
+	//using DescriptorType = const char*;
 
-	virtual DescriptorType GetType() const = 0;
+	virtual EventType GetType() const = 0;
+
+	virtual bool IsHandled() const { return m_isHandled; };
+	virtual void SetIsHandled(bool value) { m_isHandled = value; };
+
+	virtual const std::string& GetName() const { return m_debugName; }
+
+protected:
+	bool m_isHandled = false;
+	std::string m_debugName = "";
 };
 
 /**
  * @brief A sample event used for testing.
  */
-class TestEvent : public Event
+class MouseButtonPressedEvent : public Event
 {
 public:
-	TestEvent() {}
-	virtual ~TestEvent() {}
+	MouseButtonPressedEvent() { m_debugName = "MouseButtonPressedEvent"; }
+	virtual ~MouseButtonPressedEvent() {}
 
-	static constexpr DescriptorType descriptor = "TestEvent";
+	static constexpr EventType descriptor = EventType::MouseButtonPressed;
 
-	virtual DescriptorType GetType() const override
+	virtual EventType GetType() const override
 	{
 		return descriptor;
 	}
@@ -37,20 +53,21 @@ public:
 /**
  * @brief A sample windows event used for testing.
  */
-class CustomWindowEvent : public Event
+class WindowResizeEvent : public Event
 {
 public:
-	CustomWindowEvent() {}
-	CustomWindowEvent(unsigned int width, unsigned int height)
+	WindowResizeEvent() { m_debugName = "WindowResizeEvent"; }
+	WindowResizeEvent(unsigned int width, unsigned int height)
 	{
 		m_data.width = width;
 		m_data.height = height;
+		m_debugName = "WindowResizeEvent";
 	}
-	virtual ~CustomWindowEvent() {}
+	virtual ~WindowResizeEvent() {}
 
-	static constexpr DescriptorType descriptor = "CustomWindowEvent";
+	static constexpr EventType descriptor = EventType::WindowResize;
 
-	virtual DescriptorType GetType() const override
+	virtual EventType GetType() const override
 	{
 		return descriptor;
 	}

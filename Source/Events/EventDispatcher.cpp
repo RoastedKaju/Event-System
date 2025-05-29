@@ -1,11 +1,11 @@
 #include "EventDispatcher.h"
 
-void EventDispatcher::Subscribe(const Event::DescriptorType& type, FunctionType&& function)
+void EventDispatcher::Subscribe(const EventType& type, FunctionType&& function)
 {
 	m_observers[type].push_back(function);
 }
 
-void EventDispatcher::Broadcast(const Event& event) const
+void EventDispatcher::Broadcast(Event& event) const
 {
 	auto type = event.GetType();
 
@@ -19,6 +19,10 @@ void EventDispatcher::Broadcast(const Event& event) const
 
 	for (auto&& observer : observers)
 	{
+		if (event.IsHandled())
+		{
+			break;
+		}
 		// Call the function using the event you got in parameter
 		observer(event);
 	}
