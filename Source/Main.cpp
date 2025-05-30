@@ -3,6 +3,8 @@
 #include "Events/Event.h"
 #include "Events/EventDispatcher.h"
 
+using namespace SimpleEvent;
+
 // Should be a singleton
 static EventDispatcher eventDispatcher;
 
