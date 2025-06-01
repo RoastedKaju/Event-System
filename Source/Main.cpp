@@ -11,10 +11,10 @@ static EventDispatcher eventDispatcher;
 class MouseInput
 {
 public:
-	void OnInit()
+	size_t OnInit()
 	{
 		// Bind the function
-		eventDispatcher.Subscribe(MouseButtonPressedEvent::descriptor, BIND_EVENT_FN(&MouseInput::OnEventHandle, this));
+		return eventDispatcher.Subscribe(MouseButtonPressedEvent::descriptor, BIND_EVENT_FN(&MouseInput::OnEventHandle, this));
 	}
 
 	void OnEventHandle(Event& event)
@@ -30,7 +30,7 @@ public:
 
 /**
 * @brief An example layer, it subscribes to the same event as mouse input but if it is handled first the event won't propagate to this layer
-* 
+*
 */
 class AnotherLayer
 {
@@ -63,8 +63,17 @@ public:
 
 			// Get the width and height of the window
 			std::cout << "Width: " << customWindowEvent.m_data.width << " -- " << "Height: " << customWindowEvent.m_data.height << std::endl;
+
+			for (const auto name : names)
+			{
+				std::cout << name << std::endl;
+			}
 		}
 	}
+
+private:
+	// Random object owned data for testing purposes
+	std::vector<std::string> names{ "A", "B", "C" };
 };
 
 int main()
@@ -74,9 +83,12 @@ int main()
 	AnotherLayer anotherLayer;
 	anotherLayer.OnInit();
 
-	CustomWindow customWindow;
+	// Pointer to test if data is valid on callback if object deleted first.
+	CustomWindow* customWindow = new CustomWindow{};
 	// Subscription outside of class
-	eventDispatcher.Subscribe(WindowResizeEvent::descriptor, BIND_EVENT_FN(&CustomWindow::OnEventHandle, customWindow));
+	auto eventHandle = eventDispatcher.Subscribe(WindowResizeEvent::descriptor, BIND_EVENT_FN(&CustomWindow::OnEventHandle, customWindow));
+	eventDispatcher.Unsubscribe(WindowResizeEvent::descriptor, eventHandle); // Make sure to unsubscribe events before deleting the object
+	delete customWindow;
 
 	eventDispatcher.Broadcast(MouseButtonPressedEvent()); // this should call the function OnEventHandle inside the Test Observer class
 	eventDispatcher.Broadcast(WindowResizeEvent(1920, 1080));
