@@ -10,6 +10,13 @@ namespace SimpleEvent
 		return id;
 	}
 
+	SubscriptionHandle EventDispatcher::SubscribeRAII(const EventType& type, FunctionType&& function)
+	{
+		size_t id = m_nextId++;
+		m_observers[type].emplace_back(id, std::move(function));
+		return SubscriptionHandle(type, id); // instead of returning the ID it returns the RAII object
+	}
+
 	bool EventDispatcher::Unsubscribe(const EventType& type, size_t id)
 	{
 		auto itr = m_observers.find(type);

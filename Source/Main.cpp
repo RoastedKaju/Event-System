@@ -83,8 +83,12 @@ int main()
 	// Pointer to test if data is valid on callback if object deleted first.
 	CustomWindow* customWindow = new CustomWindow{};
 	// Subscription outside of class
-	auto eventHandle = EventDispatcher::Get().Subscribe(WindowResizeEvent::descriptor, BIND_EVENT_FN(&CustomWindow::OnEventHandle, customWindow));
-	EventDispatcher::Get().Unsubscribe(WindowResizeEvent::descriptor, eventHandle); // Make sure to unsubscribe events before deleting the object
+	//auto eventHandle = EventDispatcher::Get().Subscribe(WindowResizeEvent::descriptor, BIND_EVENT_FN(&CustomWindow::OnEventHandle, customWindow));
+	{
+		auto eventHandle = EventDispatcher::Get().SubscribeRAII(WindowResizeEvent::descriptor, BIND_EVENT_FN(&CustomWindow::OnEventHandle, customWindow));
+		// once this scope ends the eventHandle will automatically unsubscribe
+	}
+	//EventDispatcher::Get().Unsubscribe(WindowResizeEvent::descriptor, eventHandle); // Make sure to unsubscribe events before deleting the object
 	delete customWindow;
 
 	EventDispatcher::Get().Broadcast(MouseButtonPressedEvent()); // this should call the function OnEventHandle inside the Test Observer class

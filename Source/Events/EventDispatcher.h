@@ -10,6 +10,8 @@
 
 namespace SimpleEvent
 {
+	class SubscriptionHandle; // forward declare
+
 	class EventDispatcher
 	{
 	public:
@@ -32,6 +34,8 @@ namespace SimpleEvent
 		* @return Returns the unique ID for the subscription later used to unsubscribe
 		*/
 		size_t Subscribe(const EventType& type, FunctionType&& function);
+
+		SubscriptionHandle SubscribeRAII(const EventType& type, FunctionType&& function);
 
 		bool Unsubscribe(const EventType& type, size_t id);
 
@@ -56,12 +60,21 @@ namespace SimpleEvent
 	{
 	public:
 		SubscriptionHandle() = default;
+		SubscriptionHandle(EventType type, size_t id) : m_type{ type }, m_id{ id } {};
+
+		~SubscriptionHandle()
+		{
+			std::cout << "Unsubscribed Event ID:" << m_id << std::endl;
+			Unsubscribe();
+		}
 
 		// Subscriptions cannot be copied, they are move only
 		SubscriptionHandle(const SubscriptionHandle&) = delete;
 		SubscriptionHandle& operator=(const SubscriptionHandle&) = delete;
-
+		
+		inline void Unsubscribe() { EventDispatcher::Get().Unsubscribe(m_type, m_id); }
 	private:
-
+		EventType m_type;
+		size_t m_id = 0;
 	};
 }
