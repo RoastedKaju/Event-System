@@ -5,16 +5,13 @@
 
 using namespace SimpleEvent;
 
-// Should be a singleton
-static EventDispatcher eventDispatcher;
-
 class MouseInput
 {
 public:
 	size_t OnInit()
 	{
 		// Bind the function
-		return eventDispatcher.Subscribe(MouseButtonPressedEvent::descriptor, BIND_EVENT_FN(&MouseInput::OnEventHandle, this));
+		return EventDispatcher::Get().Subscribe(MouseButtonPressedEvent::descriptor, BIND_EVENT_FN(&MouseInput::OnEventHandle, this));
 	}
 
 	void OnEventHandle(Event& event)
@@ -38,7 +35,7 @@ public:
 	void OnInit()
 	{
 		// Bind the function
-		eventDispatcher.Subscribe(MouseButtonPressedEvent::descriptor, BIND_EVENT_FN(&AnotherLayer::OnEventHandle, this));
+		EventDispatcher::Get().Subscribe(MouseButtonPressedEvent::descriptor, BIND_EVENT_FN(&AnotherLayer::OnEventHandle, this));
 	}
 
 	void OnEventHandle(Event& event)
@@ -86,12 +83,12 @@ int main()
 	// Pointer to test if data is valid on callback if object deleted first.
 	CustomWindow* customWindow = new CustomWindow{};
 	// Subscription outside of class
-	auto eventHandle = eventDispatcher.Subscribe(WindowResizeEvent::descriptor, BIND_EVENT_FN(&CustomWindow::OnEventHandle, customWindow));
-	eventDispatcher.Unsubscribe(WindowResizeEvent::descriptor, eventHandle); // Make sure to unsubscribe events before deleting the object
+	auto eventHandle = EventDispatcher::Get().Subscribe(WindowResizeEvent::descriptor, BIND_EVENT_FN(&CustomWindow::OnEventHandle, customWindow));
+	EventDispatcher::Get().Unsubscribe(WindowResizeEvent::descriptor, eventHandle); // Make sure to unsubscribe events before deleting the object
 	delete customWindow;
 
-	eventDispatcher.Broadcast(MouseButtonPressedEvent()); // this should call the function OnEventHandle inside the Test Observer class
-	eventDispatcher.Broadcast(WindowResizeEvent(1920, 1080));
+	EventDispatcher::Get().Broadcast(MouseButtonPressedEvent()); // this should call the function OnEventHandle inside the Test Observer class
+	EventDispatcher::Get().Broadcast(WindowResizeEvent(1920, 1080));
 
 	return 0;
 }

@@ -13,7 +13,18 @@ namespace SimpleEvent
 	class EventDispatcher
 	{
 	public:
+		EventDispatcher(const EventDispatcher&) = delete;
+		EventDispatcher(EventDispatcher&&) = delete;
+		EventDispatcher& operator=(const EventDispatcher&) = delete;
+		EventDispatcher& operator=(EventDispatcher&&) = delete;
+
 		using FunctionType = std::function<void(Event&)>;
+
+		static EventDispatcher& Get()
+		{
+			static EventDispatcher instance;
+			return instance;
+		}
 
 		/**
 		* @brief Subscribes the event and it's callback
@@ -32,6 +43,10 @@ namespace SimpleEvent
 
 		/// Store unique ID for each subscription so we can remove it later.
 		size_t m_nextId = 1;
+
+	private:
+		// This forces users to call the EventDispatcher::Get()
+		EventDispatcher() = default;
 	};
 
 	/**
@@ -45,5 +60,8 @@ namespace SimpleEvent
 		// Subscriptions cannot be copied, they are move only
 		SubscriptionHandle(const SubscriptionHandle&) = delete;
 		SubscriptionHandle& operator=(const SubscriptionHandle&) = delete;
+
+	private:
+
 	};
 }
