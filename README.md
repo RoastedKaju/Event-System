@@ -13,7 +13,7 @@ Simple event system made in C++ for learning purposes, this event system is made
 
 ## 🛠️ Built With
 
-- **Language**: C
+- **Language**: C++
 - **Build System**: [Premake](https://github.com/premake/premake-core)
 - **Platform**: Windows
 
