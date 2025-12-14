@@ -1,4 +1,4 @@
-#include "EventDispatcher.h"
+#include "event_dispatcher.h"
 
 namespace SimpleEvent
 {

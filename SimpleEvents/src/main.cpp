@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "Events/Event.h"
-#include "Events/EventDispatcher.h"
+#include "event.h"
+#include "event_dispatcher.h"
 
 using namespace SimpleEvent;
 

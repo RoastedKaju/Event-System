@@ -37,3 +37,6 @@ Intermediate/
 *.exe
 *.out
 *.app
+
+# Folders
+build
