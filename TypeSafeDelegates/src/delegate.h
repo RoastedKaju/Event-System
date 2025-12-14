@@ -21,6 +21,16 @@ public:
 		m_function = fn;
 	}
 
+	/* Bind to a member function */
+	template<typename T>
+	void Bind(T* object, ReturnType(T::* fn)(Args...))
+	{
+		m_function = [object, fn](Args... args) { return (object->*fn)(std::forward<Args>(args)...); };
+	}
+
+	/* Bind to lambda or functor */
+
+
 	// Check if bound
 	bool IsBound() const { return m_function != nullptr; }
 
