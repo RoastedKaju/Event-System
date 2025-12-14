@@ -13,4 +13,5 @@ add_executable("Simple-Events"
 
 add_executable("Typesafe-Delegates"
     "TypeSafeDelegates/src/main.cpp"
-    "TypeSafeDelegates/src/delegate.h")
+    "TypeSafeDelegates/src/delegate.h"
+    "TypeSafeDelegates/src/multicast_delegate.h")

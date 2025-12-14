@@ -29,7 +29,11 @@ public:
 	}
 
 	/* Bind to lambda or functor */
-
+	template<typename Functor>
+	void BindLambda(Functor&& functor)
+	{
+		m_function = std::forward<Functor>(functor);
+	}
 
 	// Check if bound
 	bool IsBound() const { return m_function != nullptr; }
@@ -40,7 +44,7 @@ public:
 	/* Execute */
 	ReturnType Execute(Args... args) const
 	{
-		if (m_function)
+		if (IsBound())
 		{
 			return m_function(std::forward<Args>(args)...);
 		}
