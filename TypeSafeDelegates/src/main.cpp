@@ -9,6 +9,11 @@ static int ReturnNumb()
 	return 5;
 }
 
+static void PrintNumber()
+{
+	std::cout << "50 something" << std::endl;
+}
+
 class TestClass
 {
 public:
@@ -18,6 +23,11 @@ public:
 	std::string ReturnNameAndId(const std::string& name)
 	{
 		return name + std::to_string(age);
+	}
+
+	void MultiTestMember(const int health)
+	{
+		std::cout << "Health is : " << health << " And Age is : " << age << std::endl;
 	}
 
 private:
@@ -56,6 +66,16 @@ int main()
 	lambda_delegate.BindLambda(TestFunctor());
 
 	lambda_delegate.Execute(19);
+
+	// -------------------- Multicast delegate test --------------------
+	MulticastDelegate<void()> multi_printNumber;
+	multi_printNumber.Add(&PrintNumber);
+	multi_printNumber.Broadcast();
+
+	MulticastDelegate<void(const int)> multi_member_health;
+	multi_member_health.Add(some_actor, &TestClass::MultiTestMember);
+	multi_member_health.Add(TestFunctor());
+	multi_member_health.Broadcast(42);
 
 	return EXIT_SUCCESS;
 }
