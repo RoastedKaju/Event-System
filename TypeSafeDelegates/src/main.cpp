@@ -25,9 +25,19 @@ public:
 		return name + std::to_string(age);
 	}
 
+	std::string ReturnNameAndIdConst(const std::string& name) const
+	{
+		return name + std::to_string(age) + " Const Function";
+	}
+
 	void MultiTestMember(const int health)
 	{
 		std::cout << "Health is : " << health << " And Age is : " << age << std::endl;
+	}
+
+	void MultiTestMemberConst(const int health) const
+	{
+		std::cout << "CONST Health is : " << health << " And Age is : " << age << std::endl;
 	}
 
 private:
@@ -60,6 +70,11 @@ int main()
 
 	std::cout << name_delegate.Execute("Haris") << std::endl;
 
+	Delegate<std::string(const std::string&)> const_name_delegate;
+	const_name_delegate.Bind(some_actor, &TestClass::ReturnNameAndIdConst);
+
+	std::cout << const_name_delegate.Execute("Haris") << std::endl;
+
 	// Event signature for a functor
 	Delegate<void(int)> lambda_delegate;
 	lambda_delegate.BindLambda([](int x) { std::cout << "The value is: " << x << std::endl; });
@@ -75,6 +90,7 @@ int main()
 	MulticastDelegate<void(const int)> multi_member_health;
 	multi_member_health.Add(some_actor, &TestClass::MultiTestMember);
 	multi_member_health.Add(TestFunctor());
+	multi_member_health.Add(some_actor, &TestClass::MultiTestMemberConst);
 	multi_member_health.Broadcast(42);
 
 	return EXIT_SUCCESS;

@@ -28,6 +28,13 @@ public:
 		m_function = [object, fn](Args... args) { return (object->*fn)(std::forward<Args>(args)...); };
 	}
 
+	/* Bind to a member function const overload */
+	template<typename T>
+	void Bind(T* object, ReturnType(T::* fn)(Args...) const)
+	{
+		m_function = [object, fn](Args... args) { return (object->*fn)(std::forward<Args>(args)...); };
+	}
+
 	/* Bind to lambda or functor */
 	template<typename Functor>
 	void BindLambda(Functor&& functor)

@@ -40,6 +40,14 @@ public:
 		return AddInternal(std::move(lambda));
 	}
 
+	/* Add a const member function */
+	template<typename T>
+	HandleType Add(T* object, void(T::* fn)(Args...) const)
+	{
+		auto lambda = [object, fn](Args... args) { (object->*fn)(std::forward<Args>(args)...); };
+		return AddInternal(std::move(lambda));
+	}
+
 	/* Add lambda or functor */
 	template<typename Functor>
 	HandleType Add(Functor&& functor)
